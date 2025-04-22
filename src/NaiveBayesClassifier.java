@@ -39,7 +39,10 @@ public class NaiveBayesClassifier {
 
                 featureCounts.get(label).putIfAbsent(i, new HashMap<>());
 
-                Map<String, Integer> counts = featureCounts.get(label).get(i);
+                Map<String, Integer> counts = featureCounts
+                        .getOrDefault(label, new HashMap<>())
+                        .getOrDefault(i, new HashMap<>());
+
                 counts.put(feature, counts.getOrDefault(feature, 0) + 1);
             }
         }
@@ -65,7 +68,7 @@ public class NaiveBayesClassifier {
         // -> najpierw prawd apriori
         double apriori = (double) classCounts.getOrDefault(label, 0) / totalExamples;
         // ->>>>>>>>> Np., dla label="e" i totalExamples = 10, a classCounts.get("e") = 6, to prior = 6/10 = 0.6
-//        System.out.println("Apriori dla " + label + ": " + apriori);
+        System.out.println("Apriori dla " + label + ": " + apriori);
         // okej teraz iterujemy po tablicy
 
 
@@ -94,6 +97,7 @@ public class NaiveBayesClassifier {
             double condProbality = featureValMap.isEmpty() ?
                     1.0 / numFeatures :
                     (double) (matchingFeatureVal + 1) / (totalFeatureQuantity + featureValMap.size());
+
             //  -> Np  jeśli featureValue="x", label="e", i=1, matchingFeatureCount=3, totalFeatureCount=6 (3+3)
             // , a featureValueCounts.size=2 to : (3+1)/(6+2)=4/8=0.5
 
@@ -181,6 +185,7 @@ public class NaiveBayesClassifier {
 
         @Override
         public String toString() {
+
             return "Wyniki klasyfikacji:\n" +
                     "Przetworzonych przykładów: " + totalPredictions + "\n" +
                     "Poprawnie sklasyfikowanych: " + correctPredictions + "\n" +
