@@ -48,8 +48,53 @@ public class NaiveBayesClassifier {
 
     public String classify(String[] features){
 
-        return "";
+
+        // -> mamy miec probability dla (p)oisonus i (e)dible
+        double poisonusProbability = calcProbability("p", features);  // -> tu metoda calcProbality
+        double edibleProbability = calcProbability("e", features);
+
+
+
+        return poisonusProbability > edibleProbability ? "p" : "e";
 
     }
 
+    double calcProbability(String label, String[] features){
+
+        // -> najpierw prawd apriori
+        double apriori = (double) classCounts.getOrDefault(label, 0) / totalExamples;
+        // ->>>>>>>>> Np., dla label="e" i totalExamples = 10, a classCounts.get("e") = 6, to prior = 6/10 = 0.6
+
+        // okej teraz iterujemy po tablicy
+
+
+        double iloczynPrawdWarunkowych = 1;   //  -> likelihood = P(features[1] | label) * P(features[2] | label) * ... * P(features[n] | label)
+        for (int i = 0; i < features.length; i++) {
+            String feature = features[i];
+
+
+            // -> teraz pobieramy dane cechy i statystyki
+
+            Map<String, Integer> featureValMap = featureCounts.get(label).get(i);
+
+            // -> Teraz ten laplace
+            // -> ile razy featureValue wystąpiło dla danej etykiety i cechy
+            double matchingFeatureVal = featureValMap.get(feature);
+
+
+            // -> a teraz mianownik Laplace, czyli suma wszystkich wartosci dla danej etykiety  cechy rozmiar
+            int totalFeatureQuantity = 0;
+            for (int counter : featureValMap.values()) {
+                totalFeatureQuantity += counter;
+            }
+
+            // -> i teraz liczymy prawd. warunkowe z wygładzeniem laplace
+            double condProbality = (matchingFeatureVal + 1) / (totalFeatureQuantity + featureValMap.size());
+            //  -> Np  jeśli featureValue="x", label="e", i=1, matchingFeatureCount=3, totalFeatureCount=6 (3+3)
+            // , a featureValueCounts.size=2 to : (3+1)/(6+2)=4/8=0.5
+            iloczynPrawdWarunkowych *= condProbality;
+        }
+        return iloczynPrawdWarunkowych * apriori;
+
+    }
 }
