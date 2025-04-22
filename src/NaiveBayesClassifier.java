@@ -68,7 +68,7 @@ public class NaiveBayesClassifier {
         // -> najpierw prawd apriori
         double apriori = (double) classCounts.getOrDefault(label, 0) / totalExamples;
         // ->>>>>>>>> Np., dla label="e" i totalExamples = 10, a classCounts.get("e") = 6, to prior = 6/10 = 0.6
-        System.out.println("Apriori dla " + label + ": " + apriori);
+//        System.out.println("Apriori dla " + label + ": " + apriori);
         // okej teraz iterujemy po tablicy
 
 
@@ -79,7 +79,7 @@ public class NaiveBayesClassifier {
 
             // -> teraz pobieramy dane cechy i statystyki
 
-            Map<String, Integer> featureValMap = featureCounts.getOrDefault(label,new HashMap<>()).getOrDefault(i, new HashMap<>());
+            Map<String, Integer> featureValMap = featureCounts.getOrDefault(label,new HashMap<>()).getOrDefault(i , new HashMap<>());
 
 
             // -> Teraz ten laplace
@@ -116,14 +116,14 @@ public class NaiveBayesClassifier {
         int falsePositives = 0;
         int falseNegatives = 0;
 
+        totalPredictions = testData.size();
 
         for (String[] testExample : testData) {
 
             String trueLabel = testExample[0];
-            String[] features = Arrays.copyOfRange(testExample, 1, testExample.length);
-            String predictedLabel = classify(features);
+            String predictedLabel = classify(testExample);
 
-            totalPredictions++;
+
 
             if (trueLabel.equals("e") && predictedLabel.equals("e")) {
                 truePositives++;
@@ -136,17 +136,15 @@ public class NaiveBayesClassifier {
             }
 
 
-
-
             if (predictedLabel.equals(trueLabel)) {
                 correctPredictions++;
             }
         }
 
         double accuracy = (double) correctPredictions / totalPredictions;
-        double precision = (double) truePositives / (truePositives + falsePositives);
-        double recall = (double) truePositives / (truePositives + falseNegatives);
-        double f1Score = 2 * (precision * recall) / (precision + recall);
+        double precision = (truePositives + falsePositives) > 0 ? (double) truePositives / (truePositives + falsePositives) : 0;
+        double recall = (truePositives + falseNegatives) > 0 ? (double) truePositives / (truePositives + falseNegatives) : 0;
+        double f1Score = (precision + recall) > 0 ? 2 * (precision * recall) / (precision + recall) : 0;
 
 
         return new ClassificationResults(correctPredictions, totalPredictions, accuracy, precision, recall, f1Score, truePositives, trueNegatives, falsePositives, falseNegatives);

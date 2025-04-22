@@ -17,7 +17,9 @@ public class Reading {
                 String[] row = line.split(",");
                 data.add(row);
             }
+
         }
+        System.out.println("Wczytano " + data.size() + " wierszy z pliku " + filePath);
 
         reader.close();
         return data;

@@ -8,7 +8,6 @@ public class Main {
         try {
 
             nv.train("data/agaricus-lepiota.data"); // Trenujemy instancję
-
             List<String[]> testData = Reading.loadData("data/agaricus-lepiota.test.data");
 
             NaiveBayesClassifier.ClassificationResults result = nv.test(testData);
