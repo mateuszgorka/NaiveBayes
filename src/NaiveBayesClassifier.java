@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,17 +70,18 @@ public class NaiveBayesClassifier {
 
 
         double iloczynPrawdWarunkowych = 1;   //  -> likelihood = P(features[1] | label) * P(features[2] | label) * ... * P(features[n] | label)
-        for (int i = 0; i < features.length; i++) {
+        for (int i = 1; i < features.length; i++) {
             String feature = features[i];
 
 
             // -> teraz pobieramy dane cechy i statystyki
 
-            Map<String, Integer> featureValMap = featureCounts.get(label).get(i);
+            Map<String, Integer> featureValMap = featureCounts.getOrDefault(label,new HashMap<>()).getOrDefault(i, new HashMap<>());
+
 
             // -> Teraz ten laplace
             // -> ile razy featureValue wystąpiło dla danej etykiety i cechy
-            double matchingFeatureVal = featureValMap.get(feature);
+            double matchingFeatureVal = featureValMap.getOrDefault(feature, 0);
 
 
             // -> a teraz mianownik Laplace, czyli suma wszystkich wartosci dla danej etykiety  cechy rozmiar
@@ -95,6 +97,52 @@ public class NaiveBayesClassifier {
             iloczynPrawdWarunkowych *= condProbality;
         }
         return iloczynPrawdWarunkowych * apriori;
-
     }
+
+
+    public ClassificationResults test(List<String[]> testData) {
+        int correctPredictions = 0;
+        int totalPredictions = 0;
+        int truePositives = 0;
+        int trueNegatives = 0;
+        int falsePositives = 0;
+        int falseNegatives = 0;
+
+
+        for (String[] testExample : testData) {
+
+            String trueLabel = testExample[0];
+            String[] features = Arrays.copyOfRange(testExample, 1, testExample.length);
+            String predictedLabel = classify(features);
+
+            totalPredictions++;
+
+            if (trueLabel.equals("e") && predictedLabel.equals("e")) {
+                truePositives++;
+            } else if (trueLabel.equals("p") && predictedLabel.equals("p")) {
+                trueNegatives++;
+            } else if (trueLabel.equals("e") && predictedLabel.equals("p")) {
+                falseNegatives++;
+            } else if (trueLabel.equals("p") && predictedLabel.equals("e")) {
+                falsePositives++;
+            }
+
+
+
+
+            if (predictedLabel.equals(trueLabel)) {
+                correctPredictions++;
+            }
+        }
+
+        double accuracy = (double) correctPredictions / totalPredictions;
+        double precision = (double) truePositives / (truePositives + falsePositives);
+        double recall = (double) truePositives / (truePositives + falseNegatives);
+        double f1Score = 2 * (precision * recall) / (precision + recall);
+
+
+        return new ClassificationResults(correctPredictions, totalPredictions, accuracy, precision, recall, f1Score,truePositives,trueNegatives,falsePositives,falseNegatives);
+    }
+
+
 }

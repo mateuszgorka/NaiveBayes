@@ -6,6 +6,11 @@ public class Main {
         NaiveBayesClassifier nv = new NaiveBayesClassifier();
         try {
             nv.train("data/agaricus-lepiota.data");
+
+
+            String[] features = {"e", "x", "s", "n", "t"};
+            nv.classify(features);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
