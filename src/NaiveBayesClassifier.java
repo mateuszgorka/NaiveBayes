@@ -190,9 +190,9 @@ public class NaiveBayesClassifier {
                     String.format("F1-score: %.2f%%\n", f1_Score * 100) +
                     "\nMacierz pomyłek:\n" +
                     "             | Przewidywane e | Przewidywane p |\n" +
-                    "-------------+----------------+----------------+\n" +
+                    "---------------------------------------------\n" +
                     String.format("Prawdziwe e |       %6d    |       %6d    |\n", truePositives, falseNegatives) +
-                    "-------------+----------------+----------------+\n" +
+                    "---------------------------------------------\n" +
                     String.format("Prawdziwe p |       %6d    |       %6d    |\n", falsePositives, trueNegatives);
         }
     }
