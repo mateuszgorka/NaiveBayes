@@ -34,16 +34,16 @@ public class NaiveBayesClassifier {
 
             featureCounts.putIfAbsent(label, new HashMap<>());
 
-            for (int i = 0; i < line.length; i++) {
+            for (int i = 1; i < line.length; i++) {
                 String feature = line[i];  // -? dostajemy wartosc cech xyg
 
-                featureCounts.get(label).putIfAbsent(i, new HashMap<>());
 
-                Map<String, Integer> counts = featureCounts
-                        .getOrDefault(label, new HashMap<>())
-                        .getOrDefault(i, new HashMap<>());
+                Map<Integer, Map<String, Integer>> labelMap = featureCounts.get(label);
+                labelMap.putIfAbsent(i, new HashMap<>());
 
+                Map<String, Integer> counts = labelMap.get(i);
                 counts.put(feature, counts.getOrDefault(feature, 0) + 1);
+
             }
         }
         System.out.println();
@@ -76,10 +76,11 @@ public class NaiveBayesClassifier {
         for (int i = 1; i < features.length; i++) {
             String feature = features[i];
 
+            if (feature.equals("?")) continue;
 
             // -> teraz pobieramy dane cechy i statystyki
 
-            Map<String, Integer> featureValMap = featureCounts.getOrDefault(label,new HashMap<>()).getOrDefault(i , new HashMap<>());
+            Map<String, Integer> featureValMap = featureCounts.getOrDefault(label,new HashMap<>()).getOrDefault(i + 1 , new HashMap<>());
 
 
             // -> Teraz ten laplace
@@ -121,7 +122,9 @@ public class NaiveBayesClassifier {
         for (String[] testExample : testData) {
 
             String trueLabel = testExample[0];
-            String predictedLabel = classify(testExample);
+            String[] features = Arrays.copyOfRange(testExample, 1, testExample.length);
+            String predictedLabel = classify(features);
+
 
 
 
