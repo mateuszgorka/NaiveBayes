@@ -1,2 +1,2 @@
 # NaiveBayes
-ML project
+Dataset differences detection
